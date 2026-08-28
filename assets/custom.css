@@ -35,7 +35,7 @@ content: ""; width: 5.3px; height: 5.3px; border-right: 2px solid currentColor; 
 
 
 header header-menu .menu-list__list-item .menu-list__link span{ display: flex !important; flex-wrap: nowrap; flex-direction: row-reverse; height: fit-content; gap: 7px !important;align-items: center; }
-header .header__column--right header-actions shopify-account { display: none; }
+/* header .header__column--right header-actions shopify-account { display: none; } */
 div#monster-upsell-cart .mu-frequently-header { font-size: 12px !important; }
 div#monster-upsell-cart .mu-frequently-header div[aria-label="Next product"], div#monster-upsell-cart .mu-frequently-header div[aria-label="Previous product"] { border: 0 !important; }
 div#monster-upsell-cart .mu-frequently-header+div>div>div>div{ background: #F5EFE6; border-radius: 12px; }
