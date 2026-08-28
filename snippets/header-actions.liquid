@@ -56,7 +56,7 @@
   {% endif %}
   {{- block.shopify_attributes -}}
 >
-  {% if shop.customer_accounts_enabled %}
+  {% if true or shop.customer_accounts_enabled %}
     {% liquid
       assign account_actions_style = ''
       if display_style == 'text' and section
