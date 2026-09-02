@@ -225,6 +225,21 @@
                         role="list"
                         tabindex="-1"
                       >
+                        <li
+                          class="menu-drawer__list-item"
+                          style="--menu-drawer-animation-index: 0;"
+                        >
+                          <a
+                            id="HeaderDrawer-{{ link.handle }}-view-all"
+                            href="{{ link.url }}"
+                            class="menu-drawer__menu-item menu-drawer__menu-item--child focus-inset{% if link.current %} menu-drawer__menu-item--active{% endif %}"
+                            {% if link.current %}
+                              aria-current="page"
+                            {% endif %}
+                          >
+                            <span class="menu-drawer__menu-item-text wrap-text">{{ link.title | escape }}</span>
+                          </a>
+                        </li>
                         {%- for childlink in link.links -%}
                           <li
                             class="menu-drawer__list-item"
@@ -401,6 +416,18 @@
                           role="list"
                           tabindex="-1"
                         >
+                          <li class="menu-drawer__list-item">
+                            <a
+                              id="HeaderDrawer-{{ link.handle }}-view-all"
+                              href="{{ link.url }}"
+                              class="menu-drawer__menu-item menu-drawer__menu-item--parent focus-inset{% if link.current %} menu-drawer__menu-item--active{% endif %}"
+                              {% if link.current %}
+                                aria-current="page"
+                              {% endif %}
+                            >
+                              <span class="menu-drawer__menu-item-text wrap-text">{{ link.title | escape }}</span>
+                            </a>
+                          </li>
                           {% assign first_accordion_open = false -%}
                           {%- for childlink in link.links -%}
                             <li
@@ -479,6 +506,23 @@
                                         role="list"
                                         tabindex="-1"
                                       >
+                                        <li
+                                          class="menu-drawer__list-item"
+                                          style="--menu-drawer-animation-index: 0;"
+                                        >
+                                          <a
+                                            id="HeaderDrawer-{{ link.handle }}-{{ childlink.handle }}-view-all"
+                                            href="{{ childlink.url }}"
+                                            class="menu-drawer__menu-item menu-drawer__menu-item--child focus-inset{% if childlink.current %} menu-drawer__menu-item--active{% endif %}"
+                                            {% if childlink.current %}
+                                              aria-current="page"
+                                            {% endif %}
+                                          >
+                                            <span class="menu-drawer__menu-item-text wrap-text">
+                                              {{- childlink.title | escape -}}
+                                            </span>
+                                          </a>
+                                        </li>
                                         {%- for grandchildlink in childlink.links -%}
                                           <li
                                             class="menu-drawer__list-item"

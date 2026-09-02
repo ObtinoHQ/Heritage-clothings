@@ -1,3 +1,24 @@
+{% liquid
+  assign desktop_poster_image = section.settings.desktop_image | default: section.settings.desktop_video.preview_image
+  assign mobile_poster_image = section.settings.mob | default: section.settings.mobile_video.preview_image
+  assign desktop_poster_url = ''
+  assign mobile_poster_url = ''
+
+  if desktop_poster_image != blank
+    assign desktop_poster_url = desktop_poster_image | image_url: width: 2800
+  endif
+  if mobile_poster_image != blank
+    assign mobile_poster_url = mobile_poster_image | image_url: width: 1400
+  endif
+%}
+
+{% if desktop_poster_url != blank %}
+  <link rel="preload" as="image" href="{{ desktop_poster_url }}" media="(min-width: 750px)" fetchpriority="high">
+{% endif %}
+{% if mobile_poster_url != blank %}
+  <link rel="preload" as="image" href="{{ mobile_poster_url }}" media="(max-width: 749px)" fetchpriority="high">
+{% endif %}
+
 <section class="heritage_hero_" data-content-position="{{ section.settings.content_position | default: 'left' }}">
   {% comment %}
     A video uploaded through the theme editor is not usable via video_tag
@@ -33,13 +54,13 @@
           muted: true,
           controls: false,
           class: 'heritage_hero_image_ heritage_hero_bg_video_',
-          poster: section.settings.desktop_image
+          poster: desktop_poster_url
       }}
     {% elsif section.settings.desktop_image != blank %}
       {{
         section.settings.desktop_image
         | image_url: width: 2800
-        | image_tag: class: 'heritage_hero_image_', loading: 'lazy'
+        | image_tag: class: 'heritage_hero_image_', loading: 'eager', fetchpriority: 'high'
       }}
     {% endif %}
 
@@ -52,10 +73,14 @@
           muted: true,
           controls: false,
           class: 'mob heritage_hero_bg_video_',
-          poster: section.settings.mob
+          poster: mobile_poster_url
       }}
     {% elsif section.settings.mob != blank %}
-      <img class="mob" src="{{section.settings.mob | img_url: 'master' }}" alt="img">
+      {{
+        section.settings.mob
+        | image_url: width: 1400
+        | image_tag: class: 'mob', loading: 'eager', fetchpriority: 'high', alt: ''
+      }}
     {% endif %}
 
     {% if section.settings.enable_overlay %}

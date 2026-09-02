@@ -2,9 +2,58 @@
 
 {%- assign block_settings = block.settings -%}
 {%- assign plain_text = block_settings.text | strip_newlines | strip_html | strip -%}
-{%- assign block_index = section.blocks | find_index: 'id', block.id -%}
+{%- liquid
+  assign visitor_country = localization.country.iso_code | upcase | strip
+  assign country_codes_input = block_settings.country_codes | strip
+  assign country_codes = country_codes_input | upcase | replace: ' ', '' | replace: ';', ','
+  assign country_codes_csv = country_codes | prepend: ',' | append: ','
+  assign visitor_country_needle = visitor_country | prepend: ',' | append: ','
+  assign country_match = false
 
-{%- unless plain_text == '' -%}
+  if country_codes_input != blank and visitor_country != blank and country_codes_csv contains visitor_country_needle
+    assign country_match = true
+  endif
+
+  assign show_announcement = true
+  if country_codes_input != blank
+    if block_settings.country_visibility == 'only' and country_match == false
+      assign show_announcement = false
+    elsif block_settings.country_visibility == 'except' and country_match
+      assign show_announcement = false
+    endif
+  endif
+
+  assign visible_block_index = 0
+  for announcement_block in section.blocks
+    if announcement_block.id == block.id
+      break
+    endif
+
+    assign previous_text = announcement_block.settings.text | strip_newlines | strip_html | strip
+    assign previous_codes_input = announcement_block.settings.country_codes | strip
+    assign previous_codes = previous_codes_input | upcase | replace: ' ', '' | replace: ';', ','
+    assign previous_codes_csv = previous_codes | prepend: ',' | append: ','
+    assign previous_match = false
+    if previous_codes_input != blank and visitor_country != blank and previous_codes_csv contains visitor_country_needle
+      assign previous_match = true
+    endif
+
+    assign previous_visible = true
+    if previous_codes_input != blank
+      if announcement_block.settings.country_visibility == 'only' and previous_match == false
+        assign previous_visible = false
+      elsif announcement_block.settings.country_visibility == 'except' and previous_match
+        assign previous_visible = false
+      endif
+    endif
+
+    if previous_text != blank and previous_visible
+      assign visible_block_index = visible_block_index | plus: 1
+    endif
+  endfor
+-%}
+
+{%- if plain_text != blank and show_announcement -%}
   <slideshow-slide
     ref="slides[]"
     class="
@@ -25,7 +74,7 @@
       --line-height: 1;
     "
     {{ block.shopify_attributes }}
-    aria-hidden="{% if block_index == 0 %}false{% else %}true{% endif %}"
+    aria-hidden="{% if visible_block_index == 0 %}false{% else %}true{% endif %}"
   >
     <p class="announcement-bar__text">
       {{ block.settings.text }}
@@ -41,8 +90,8 @@
         </span>
       </a>
     {% endif %}
-  </slideshow-slide>
-{%- endunless -%}
+</slideshow-slide>
+{%- endif -%}
 
 {% stylesheet %}
   .text-block:not(.text-block--full-width).rte,
@@ -130,6 +179,36 @@
       "type": "url",
       "id": "link",
       "label": "t:settings.link"
+    },
+    {
+      "type": "header",
+      "content": "Country visibility"
+    },
+    {
+      "type": "select",
+      "id": "country_visibility",
+      "label": "Show this announcement",
+      "options": [
+        {
+          "value": "everywhere",
+          "label": "Everywhere"
+        },
+        {
+          "value": "only",
+          "label": "Only in selected countries"
+        },
+        {
+          "value": "except",
+          "label": "Everywhere except selected countries"
+        }
+      ],
+      "default": "everywhere"
+    },
+    {
+      "type": "text",
+      "id": "country_codes",
+      "label": "Country codes",
+      "info": "Comma-separated ISO codes, for example: GB, US, CA. A blank list shows the announcement everywhere."
     },
     {
       "type": "header",
